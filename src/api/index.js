@@ -48,6 +48,17 @@ export const reqDeleteImg = (name) => ajax(BASE + '/manage/img/delete', {
     name
 }, "POST")
 
+export const reqUploadImg = (file) => ajax(BASE + '/manage/img/upload',
+    file, "POST");
+
+export const reqAddOrUpdateProduct = (product) => ajax(BASE + '/manage/product/' + (product._id ? 'update' : 'add'), product, 'POST')
+
+export const reqRoles = () => ajax(BASE + '/manage/role/list')
+
+export const reqAddRole = (roleName) => ajax(BASE + '/manage/role/add', {
+    roleName
+}, 'POST')
+
 export const reqWeather = () => ajax('/api2', {
     district_id: 420100,
     data_type: 'all',

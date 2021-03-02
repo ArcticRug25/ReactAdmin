@@ -1,8 +1,8 @@
 import React from "react";
-import { Card, Form, Input, Cascader, Button } from "antd";
+import { Card, Form, Input, Cascader, Button, message } from "antd";
 import LinkButton from "../../components/LinkButton";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { reqCategorys } from "../../api";
+import { reqCategorys, reqAddOrUpdateProduct } from "../../api";
 import PicturesWall from "./PicturesWall";
 import RichTextEditor from "./RichTextEditor";
 
@@ -49,12 +49,40 @@ export default function ProductAddUpdate(props) {
     pw = React.createRef(),
     editor = React.createRef();
 
-  const onFinish = (...args) => {
-    console.log(args);
+  const onFinish = async (val) => {
+    const { name, desc, price, category } = val;
+    let pCategoryId, categoryId;
+    if (category.length === 1) {
+      pCategoryId = "0";
+      categoryId = category[0];
+    } else {
+      pCategoryId = category[0];
+      categoryId = category[1];
+    }
     const imgs = pw.current.getImgs();
-    const details = editor.current.getDetails();
-    console.log(imgs);
-    console.log(details);
+    const detail = editor.current.getDetails();
+
+    const productObj = {
+      name,
+      desc,
+      price,
+      imgs,
+      detail,
+      pCategoryId,
+      categoryId,
+    };
+
+    if (isUpdate) {
+      productObj._id = product._id;
+    }
+
+    const res = await reqAddOrUpdateProduct(productObj);
+    if (res.status === 0) {
+      message.success(`${isUpdate ? "更新" : "添加"}商品成功！`);
+      props.history.goBack();
+    } else {
+      message.error(`${isUpdate ? "更新" : "添加"}商品失败`);
+    }
   };
 
   const getCategorys = async (parentId) => {

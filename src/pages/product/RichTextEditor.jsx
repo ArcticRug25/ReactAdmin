@@ -7,6 +7,7 @@ import { EditorState, convertToRaw, ContentState } from "draft-js";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from "draftjs-to-html";
 import htmlToDraft from "html-to-draftjs";
+import { reqUploadImg } from "../../api";
 
 export default class RichTextEditor extends Component {
   constructor(props) {
@@ -41,6 +42,20 @@ export default class RichTextEditor extends Component {
     );
   };
 
+  uploadImageCallBack = (file) => {
+    return new Promise(async (resolve, reject) => {
+      let formData = new FormData();
+      formData.append("image", file);
+      const uploadImgRes = await reqUploadImg(formData);
+      if (uploadImgRes.status === 0) {
+        const link = uploadImgRes.data.url.replace('localhost','zlx.cool');
+        resolve({ data: { link } });
+      } else {
+        reject("出错了");
+      }
+    });
+  };
+
   render() {
     const { editorState } = this.state;
 
@@ -53,6 +68,12 @@ export default class RichTextEditor extends Component {
             border: "1px solid black",
             minHeight: 200,
             paddingLeft: 10,
+          }}
+          toolbar={{
+            image: {
+              uploadCallback: this.uploadImageCallBack,
+              alt: { present: true, mandatory: true },
+            },
           }}
           onEditorStateChange={this.onEditorStateChange}
         />
