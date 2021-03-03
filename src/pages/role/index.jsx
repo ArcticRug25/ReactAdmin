@@ -6,8 +6,9 @@ import memoryUtils from "../../utils/memoryUtils";
 import { formateDate } from "../../utils/dateUtils";
 import AddForm from "./AddForm";
 import AuthForm from "./AuthForm";
+import storageUtils from "../../utils/storageUtils";
 
-export default function Role() {
+export default function Role({ history }) {
   const [roles, setRoles] = useState(),
     [loading, setLoading] = useState(false),
     [status, setStatus] = useState(0),
@@ -93,8 +94,15 @@ export default function Role() {
     role.auth_name = memoryUtils.user.username;
     const updateRoleRes = await reqUpdateRole(role);
     if (updateRoleRes.status === 0) {
-      getRoles();
-      message.success("设置角色权限成功");
+      if (role._id === memoryUtils.user.role_id) {
+        memoryUtils.user = {};
+        storageUtils.removeUser();
+        history.replace("/login");
+        message.info("角色权限已变更，请重新登录");
+      } else {
+        getRoles();
+        message.success("设置角色权限成功");
+      }
     } else {
       message.error("设置角色权限失败");
     }

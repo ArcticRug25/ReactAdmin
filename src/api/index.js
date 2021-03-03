@@ -8,8 +8,6 @@ export const reqLogin = (username, password) => ajax(BASE + '/login', {
     password
 }, 'POST');
 
-export const reqAddUser = user => ajax(BASE + '/manage/user/add', user, 'POST')
-
 export const reqCategorys = (parentId) => ajax(BASE + '/manage/category/list', {
     parentId
 }, 'GET')
@@ -60,6 +58,14 @@ export const reqAddRole = (roleName) => ajax(BASE + '/manage/role/add', {
 }, 'POST')
 
 export const reqUpdateRole = (role) => ajax(BASE + '/manage/role/update', role, 'POST')
+
+export const reqUsers = () => ajax(BASE + '/manage/user/list')
+
+export const reqDeleteUser = (userId) => ajax(BASE + '/manage/user/delete', {
+    userId
+}, 'POST')
+
+export const reqAddOrUpdateUser = (user) => ajax(BASE + '/manage/user/'+(user._id?'update':'add'), user, 'POST')
 
 export const reqWeather = () => ajax('/api2', {
     district_id: 420100,
