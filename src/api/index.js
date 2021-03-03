@@ -59,6 +59,8 @@ export const reqAddRole = (roleName) => ajax(BASE + '/manage/role/add', {
     roleName
 }, 'POST')
 
+export const reqUpdateRole = (role) => ajax(BASE + '/manage/role/update', role, 'POST')
+
 export const reqWeather = () => ajax('/api2', {
     district_id: 420100,
     data_type: 'all',

@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Card, Table, Button, Modal, message } from "antd";
-import { reqRoles, reqAddRole } from "../../api";
+import { reqRoles, reqAddRole, reqUpdateRole } from "../../api";
 import { PAGE_SIZE } from "../../utils/constants";
+import memoryUtils from "../../utils/memoryUtils";
+import { formateDate } from "../../utils/dateUtils";
 import AddForm from "./AddForm";
 import AuthForm from "./AuthForm";
 
@@ -10,6 +12,8 @@ export default function Role() {
     [loading, setLoading] = useState(false),
     [status, setStatus] = useState(0),
     [role, setRole] = useState({});
+
+  const authForm = useRef();
 
   let formIns;
 
@@ -37,10 +41,12 @@ export default function Role() {
     {
       title: "创建时间",
       dataIndex: "create_time",
+      render: formateDate,
     },
     {
       title: "授权时间",
       dataIndex: "auth_time",
+      render: formateDate,
     },
     {
       title: "授权人",
@@ -57,6 +63,10 @@ export default function Role() {
   };
 
   const handleCancel = () => {
+    if (status === 2) {
+      let a = { ...role };
+      setRole(a);
+    }
     setStatus(0);
   };
 
@@ -75,7 +85,20 @@ export default function Role() {
     formIns.resetFields();
   };
 
-  const updateRole = () => {};
+  const updateRole = async () => {
+    setStatus(0);
+    const menus = authForm.current.props.checkedKeys;
+    role.menus = menus;
+    role.auth_time = Date.now();
+    role.auth_name = memoryUtils.user.username;
+    const updateRoleRes = await reqUpdateRole(role);
+    if (updateRoleRes.status === 0) {
+      getRoles();
+      message.success("设置角色权限成功");
+    } else {
+      message.error("设置角色权限失败");
+    }
+  };
 
   const getRoles = async () => {
     setLoading(true);
@@ -94,7 +117,11 @@ export default function Role() {
         bordered
         rowKey="_id"
         loading={loading}
-        rowSelection={{ type: "radio", selectedRowKeys: [role._id] }}
+        rowSelection={{
+          type: "radio",
+          selectedRowKeys: [role._id],
+          onSelect: (role) => setRole(role),
+        }}
         dataSource={roles}
         columns={columns}
         pagination={{ defaultPageSize: PAGE_SIZE }}
@@ -116,7 +143,7 @@ export default function Role() {
         onOk={updateRole}
         onCancel={handleCancel}
       >
-        <AuthForm role={role} />
+        <AuthForm ref={authForm} role={role} />
       </Modal>
     </Card>
   );

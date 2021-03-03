@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, forwardRef } from "react";
 import PropTypes from "prop-types";
 import { Form, Input, Tree } from "antd";
 import menuList from "../../config/menuConfig";
 
 const { Item } = Form;
 
-export default function AuthForm(props) {
+const AuthForm = forwardRef((props, ref) => {
   const formItemLayout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 16 },
@@ -29,10 +29,15 @@ export default function AuthForm(props) {
   };
 
   const [treeData] = useState(() => {
-    return [
-      { title: "平台权限", key: "/index", children: getMenuList(menuList) },
-    ];
-  });
+      return [
+        { title: "平台权限", key: "all", children: getMenuList(menuList) },
+      ];
+    }),
+    [checkedKeys, setCheckedKeys] = useState(props.role.menus);
+
+  const onCheck = (checkedKeys) => setCheckedKeys(checkedKeys);
+
+  useEffect(() => setCheckedKeys(props.role.menus), [props.role]);
 
   return (
     <Form {...formItemLayout}>
@@ -40,15 +45,24 @@ export default function AuthForm(props) {
         <Input value={props.role.name} disabled />
       </Item>
 
-      <Tree checkable defaultExpandAll={true} treeData={treeData}>
+      <Tree
+        checkable
+        defaultExpandAll
+        treeData={treeData}
+        checkedKeys={checkedKeys}
+        onCheck={onCheck}
+        ref={ref}
+      >
         {/* <TreeNode title="平台权限" key="all">
           {getMenuList(menuList)}
         </TreeNode> */}
       </Tree>
     </Form>
   );
-}
+});
 
 AuthForm.propTypes = {
   role: PropTypes.object,
 };
+
+export default AuthForm;
