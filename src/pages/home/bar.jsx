@@ -1,0 +1,67 @@
+import { Chart, Interval } from "bizcharts";
+
+const data = [
+  {
+    year: "1月",
+    sales: 38,
+  },
+  {
+    year: "2月",
+    sales: 52,
+  },
+  {
+    year: "3月",
+    sales: 61,
+  },
+  {
+    year: "4月",
+    sales: 145,
+  },
+  {
+    year: "5月",
+    sales: 48,
+  },
+  {
+    year: "6月",
+    sales: 38,
+  },
+  {
+    year: "7月",
+    sales: 28,
+  },
+  {
+    year: "8月",
+    sales: 38,
+  },
+  {
+    year: "59月",
+    sales: 68,
+  },
+  {
+    year: "10月",
+    sales: 38,
+  },
+  {
+    year: "11月",
+    sales: 58,
+  },
+  {
+    year: "12月",
+    sales: 38,
+  },
+];
+const cols = {
+  sales: {
+    tickInterval: 20,
+  },
+};
+
+export default function Bar() {
+  return (
+    <div style={{ width: "100%", height:'98%',display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <Chart height={330} width={'90%'} autoFit data={data} scale={cols}>
+        <Interval position="year*sales" />
+      </Chart>
+    </div>
+  );
+}

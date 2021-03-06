@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
+import { connect } from "react-redux";
 import { Card, Table, Button, Modal, message } from "antd";
 import { reqRoles, reqAddRole, reqUpdateRole } from "../../api";
 import { PAGE_SIZE } from "../../utils/constants";
-import memoryUtils from "../../utils/memoryUtils";
 import { formateDate } from "../../utils/dateUtils";
 import AddForm from "./AddForm";
 import AuthForm from "./AuthForm";
-import storageUtils from "../../utils/storageUtils";
+import { logout } from "../../redux/actions";
 
-export default function Role({ history }) {
+function Role({ history, user, logout }) {
   const [roles, setRoles] = useState(),
     [loading, setLoading] = useState(false),
     [status, setStatus] = useState(0),
@@ -91,12 +91,11 @@ export default function Role({ history }) {
     const menus = authForm.current.props.checkedKeys;
     role.menus = menus;
     role.auth_time = Date.now();
-    role.auth_name = memoryUtils.user.username;
+    role.auth_name = user.username;
     const updateRoleRes = await reqUpdateRole(role);
     if (updateRoleRes.status === 0) {
-      if (role._id === memoryUtils.user.role_id) {
-        memoryUtils.user = {};
-        storageUtils.removeUser();
+      if (role._id === user.role_id) {
+        logout();
         history.replace("/login");
         message.info("角色权限已变更，请重新登录");
       } else {
@@ -156,3 +155,7 @@ export default function Role({ history }) {
     </Card>
   );
 }
+
+export default connect((state) => ({ user: state.user }), {
+  logout,
+})(Role);

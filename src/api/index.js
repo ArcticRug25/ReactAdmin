@@ -65,7 +65,9 @@ export const reqDeleteUser = (userId) => ajax(BASE + '/manage/user/delete', {
     userId
 }, 'POST')
 
+
 export const reqAddOrUpdateUser = (user) => ajax(BASE + '/manage/user/'+(user._id?'update':'add'), user, 'POST')
+
 
 export const reqWeather = () => ajax('/api2', {
     district_id: 420100,

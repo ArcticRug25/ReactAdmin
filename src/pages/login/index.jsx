@@ -1,18 +1,17 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import logo from "../../assets/img/logo.png";
-import { Form, Input, Button, message } from "antd";
+import logo from "../../assets/img/logo.svg";
+import { Form, Input, Button } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
-import { reqLogin } from "../../api";
-import memoryUtils from "../../utils/memoryUtils";
-import storageUtils from "../../utils/storageUtils";
+import { connect } from "react-redux";
+import { login } from "../../redux/actions";
 import "./index.less";
 
-export default class Login extends Component {
+class Login extends Component {
   render() {
-    const user = memoryUtils.user;
+    const { user, errorMsg } = this.props;
     if (user && user._id) {
-      return <Redirect to="/admin" />;
+      return <Redirect to="/home" />;
     }
 
     return (
@@ -22,6 +21,9 @@ export default class Login extends Component {
           <h1>React项目: 后台管理系统</h1>
         </header>
         <section className="login-content">
+          <div className={errorMsg !== "" ? "error-msg show" : "error-msg"}>
+            {errorMsg}
+          </div>
           <h2>用户登陆</h2>
           <NormalLoginForm {...this.props} />
         </section>
@@ -31,29 +33,12 @@ export default class Login extends Component {
 }
 
 const NormalLoginForm = (props) => {
-  const { history } = props;
+  const { login } = props;
 
   const onFinish = async (val) => {
     const { username, password } = val;
-    const loginRes = await reqLogin(username, password);
-    // console.log(data);
-    if (loginRes.status === 0) {
-      message.success("登录成功");
-
-      const user = loginRes.data;
-      memoryUtils.user = user;
-      storageUtils.saveUser(user);
-      history.replace("/");
-    } else {
-      message.error(loginRes.msg);
-    }
+    login(username, password);
   };
-
-  //   const [form] = Form.useForm()
-
-  //   React.useEffect(()=>{
-  //     console.log(form);
-  //   })
 
   return (
     <Form onFinish={onFinish} className="login-form">
@@ -97,3 +82,10 @@ const NormalLoginForm = (props) => {
     </Form>
   );
 };
+
+export default connect(
+  (state) => ({ user: state.user, errorMsg: state.errorMsg }),
+  {
+    login,
+  }
+)(Login);

@@ -1,4 +1,6 @@
 import React from "react";
+import { connect } from "react-redux";
+import { setProduct } from "../../redux/actions";
 import { Card, Form, Input, Cascader, Button, message } from "antd";
 import LinkButton from "../../components/LinkButton";
 import { ArrowLeftOutlined } from "@ant-design/icons";
@@ -9,16 +11,16 @@ import RichTextEditor from "./RichTextEditor";
 const { Item } = Form,
   { TextArea } = Input;
 
-export default function ProductAddUpdate(props) {
+function ProductAddUpdate(props) {
   const layout = {
       labelCol: { span: 2 },
       wrapperCol: { span: 8 },
     },
     [form] = Form.useForm(),
     [product] = React.useState(() => {
-      const updateProduct = props.history.location.state;
+      const updateProduct = props.product;
       if (!!updateProduct) {
-        const productDetail = updateProduct.product;
+        const productDetail = updateProduct;
         if (productDetail.pCategoryId === "0") {
           productDetail.categoryIds = [productDetail.categoryId];
         } else {
@@ -31,9 +33,7 @@ export default function ProductAddUpdate(props) {
       }
       return {};
     }),
-    [isUpdate] = React.useState(() =>
-      props.history.location.state ? true : false
-    ),
+    [isUpdate] = React.useState(() => (props.product._id ? true : false)),
     [options, setOptions] = React.useState([]),
     title = (
       <span>
@@ -71,7 +71,6 @@ export default function ProductAddUpdate(props) {
       pCategoryId,
       categoryId,
     };
-
     if (isUpdate) {
       productObj._id = product._id;
     }
@@ -142,8 +141,11 @@ export default function ProductAddUpdate(props) {
     setOptions([...options]);
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  React.useEffect(() => getCategorys("0"), []);
+  React.useEffect(() => {
+    getCategorys("0");
+    return () => props.setProduct({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   React.useEffect(() => form.resetFields(), [form, product]);
 
@@ -211,3 +213,7 @@ export default function ProductAddUpdate(props) {
     </Card>
   );
 }
+
+export default connect((state) => ({ product: state.product }), { setProduct })(
+  ProductAddUpdate
+);

@@ -1,6 +1,8 @@
 /* eslint-disable no-undef */
 import React, { Component } from "react";
 import { Card, Select, Input, Button, Table, Form, message } from "antd";
+import { connect } from "react-redux";
+import { setProduct } from "../../redux/actions";
 import { PlusOutlined } from "@ant-design/icons";
 import LinkButton from "../../components/LinkButton";
 import { reqProducts, reqSearchProducts, reqUpdateStatus } from "../../api";
@@ -8,7 +10,7 @@ import { PAGE_SIZE } from "../../utils/constants";
 
 const Option = Select.Option;
 
-export default class ProductHome extends Component {
+class ProductHome extends Component {
   state = {
     loading: false,
     products: [],
@@ -61,16 +63,12 @@ export default class ProductHome extends Component {
         render: (product) => (
           <span>
             <LinkButton
-              onClick={() =>
-                this.props.history.push("/product/detail", { product })
-              }
+              onClick={() => this.goProduct("/product/detail", product)}
             >
               详情
             </LinkButton>
             <LinkButton
-              onClick={() =>
-                this.props.history.push("/product/addupdate", { product })
-              }
+              onClick={() => this.goProduct("/product/addupdate", product)}
             >
               修改
             </LinkButton>
@@ -78,6 +76,11 @@ export default class ProductHome extends Component {
         ),
       },
     ];
+  };
+
+  goProduct = (path, product) => {
+    this.props.setProduct(product);
+    this.props.history.push(path);
   };
 
   getProducts = async (pageNum) => {
@@ -170,3 +173,7 @@ export default class ProductHome extends Component {
     );
   }
 }
+
+export default connect(null, {
+  setProduct,
+})(ProductHome);

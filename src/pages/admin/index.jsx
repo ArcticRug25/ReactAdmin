@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import memoryUtils from "../../utils/memoryUtils";
+import { connect } from "react-redux";
 import { Redirect, Route, Switch } from "react-router-dom";
 import { Layout } from "antd";
 import Header from "../../components/Header";
@@ -12,12 +12,13 @@ import User from "../user";
 import Bar from "../charts/bar";
 import Line from "../charts/line";
 import Pie from "../charts/pie";
+import NotFound from '../notfound';
 
 const { Footer, Sider, Content } = Layout;
 
-export default class Admin extends Component {
+class Admin extends Component {
   render() {
-    const user = memoryUtils.user;
+    const user = this.props.user;
     if (!user || !user._id) {
       return <Redirect to="/login" />;
     }
@@ -31,6 +32,7 @@ export default class Admin extends Component {
           <Header {...this.props}>Header</Header>
           <Content style={{ margin: 20, backgroundColor: "#fff" }}>
             <Switch>
+              <Redirect exact from="/" to={`/home`} />
               <Route path="/home" component={Home} />
               <Route path={`/category`} component={Category} />
               <Route path={`/product`} component={Product} />
@@ -39,7 +41,7 @@ export default class Admin extends Component {
               <Route path={`/charts/bar`} component={Bar} />
               <Route path={`/charts/pie`} component={Pie} />
               <Route path={`/charts/line`} component={Line} />
-              <Redirect from="/" to={`/home`} />
+              <Route component={NotFound} />
             </Switch>
           </Content>
           <Footer style={{ textAlign: "center", color: "#ccc" }}>
@@ -50,3 +52,5 @@ export default class Admin extends Component {
     );
   }
 }
+
+export default connect((state) => ({ user: state.user }), {})(Admin);
